@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capture Location & Camera</title>
+</head>
+<body>
+    <h2>Click to Capture Location, Image & Video</h2>
+    <button onclick="getLocationAndCapture()">Start</button>
+    <p id="location"></p>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <button onclick="captureImage()">Capture Image</button>
+
+    <script>
+        function getLocationAndCapture() {
+            // Get location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    document.getElementById("location").innerHTML =
+                        `Latitude: ${position.coords.latitude}, Longitude: ${position.coords.longitude}`;
+                }, error => {
+                    alert("Location access denied!");
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+
+            // Access Camera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    document.getElementById("video").srcObject = stream;
+                })
+                .catch(err => {
+                    alert("Camera access denied!");
+                });
+        }
+
+        function captureImage() {
+            const video = document.getElementById("video");
+            const canvas = document.getElementById("canvas");
+            const context = canvas.getContext("2d");
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const imgData = canvas.toDataURL("image/png");
+            console.log("Captured Image:", imgData);
+            alert("Image Captured! (Check Console)");
+        }
+    </script>
+</body>
+</html>
